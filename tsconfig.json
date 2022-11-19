@@ -3,7 +3,7 @@
     "outDir": "./dist",
     "target": "es6",
     "module": "esnext",
-    "jsx": "react",
+    "jsx": "react-jsx",
     "noImplicitAny": true,
     "allowSyntheticDefaultImports": true,
     "lib": ["dom", "dom.iterable", "esnext"],
@@ -14,7 +14,8 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "typeRoots": ["src/types"]
   },
   "include": ["src"]
 }
