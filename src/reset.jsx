@@ -125,6 +125,11 @@ const reset = css`
     content: "";
     content: none;
   }
+  a {
+    color: unset;
+    text-decoration: none;
+    outline: none;
+  }
   table {
     border-collapse: collapse;
     border-spacing: 0;

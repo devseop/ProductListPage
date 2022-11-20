@@ -5,10 +5,10 @@ import { Global } from "@emotion/react";
 
 const App = () => {
   return (
-    <>
+    <React.Fragment>
       <Global styles={reset} />
       <Router />
-    </>
+    </React.Fragment>
   );
 };
 

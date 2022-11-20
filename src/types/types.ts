@@ -1,50 +1,45 @@
-export interface ClubListFromServer {
-  club: Club;
+export interface IClubListFromServer {
+  club: IClubFromServer;
   createdAt: string;
-  leaders: Leader[];
-  partners: Partner[];
+  leaders: ILeaders[];
+  partners: IPartners[];
   price: number;
 }
 
-export interface Club {
+export interface IClubFromServer {
   coverUrl: string;
   description: string;
   id: string;
-  meetings: Meeting[];
+  meetings: IMeeting[];
   name: string;
   place: string;
   type: string;
 }
 
-export interface Meeting {
+export interface IClub {
+  id: string;
+  thumbnail: string;
+  title: string;
+  desc: string;
+  leaders: ILeaders[];
+  partners: IPartners[];
+  endTime: string;
+  place: string;
+  startTime: string;
+  meeting: IMeeting[];
+  price: number;
+}
+
+export interface IMeeting {
   endedAt: string;
   order: number;
   startedAt: string;
 }
 
-export interface Leader {
+export interface ILeaders {
   name: string;
 }
 
-export interface Partner {
+export interface IPartners {
   name: string;
 }
-
-export type CardInfo = {
-  id: string;
-  thumbnail: string;
-  title: string;
-  desc: string;
-  leader: string;
-  partner: string;
-  endTime: string;
-  place: string;
-  startTime: string;
-};
-
-export type MeetInfo = {
-  id: string;
-  endTime: string;
-  place: string;
-  startTime: string;
-};

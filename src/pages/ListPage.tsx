@@ -1,14 +1,18 @@
-import styled from "@emotion/styled";
-import React, { memo, useCallback, useEffect, useState } from "react";
+import React, { memo, useState } from "react";
 import SearchBar from "../components/SearchBar";
 import { useFetch } from "../hooks";
-import { ClubListFromServer, CardInfo } from "../types/types";
+import styled from "@emotion/styled";
+import { IClubListFromServer, IClub } from "../types/types";
 import iconUnlike from "../image/unlike.png";
 import iconLike from "../image/like.png";
+import { useNavigate } from "react-router-dom";
+
+/** 한국식 요일 설정을 위한 상수 */
+export const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
 // useFetch로 API 받아오기
-const ClubDataFromServer = () => {
-  const { data: ClubsFromServer, error } = useFetch<ClubListFromServer[]>(
+const ClubListFromServer = () => {
+  const { data: ClubsFromServer, error } = useFetch<IClubListFromServer[]>(
     "https://api.json-generator.com/templates/ePNAVU1sgGtQ/data",
     {
       method: "GET",
@@ -28,67 +32,57 @@ const ClubDataFromServer = () => {
   }
 
   const clubList = formatClubList(ClubsFromServer);
-  // const meetInfo = formatDate(ClubsFromServer);
 
   return <ClubItemUI clubList={clubList} />;
 };
 
-// 받아온 데이터를 쓸 수 있도록 재조합하기
-const formatClubList = (data: ClubListFromServer[]): CardInfo[] => {
+/**받아온 데이터를 쓸 수 있도록 재조합하기*/
+const formatClubList = (data: IClubListFromServer[]): IClub[] => {
   return data.map((clubList) => ({
     id: clubList.club.id,
     thumbnail: clubList.club.coverUrl,
     title: clubList.club.name,
     desc: clubList.club.description,
-    leader: clubList.leaders[0].name,
-    partner: clubList.partners[0].name,
+    leaders: clubList.leaders,
+    partners: clubList.partners,
     startTime: clubList.club.meetings[0].startedAt,
     endTime: clubList.club.meetings[0].endedAt,
     place: clubList.club.place,
+    meeting: clubList.club.meetings,
+    price: clubList.price,
   }));
 };
 
-// const formatDate = (data: ClubListFromServer[]): MeetInfo[] => {
-//   return data.map((meetInfo) => ({
-//     id: meetInfo.club.id,
-//     startTime: meetInfo.club.meetings[0].startedAt,
-//     endTime: meetInfo.club.meetings[0].endedAt,
-//     place: meetInfo.club.place,
-//   }));
-// };
-
-// 받아온 데이터를 UI로 구성하기
-const ClubItemUI = memo(({ clubList }: { clubList: CardInfo[] }) => {
-  console.log(clubList);
-  // 데이터 원본을 확인하기 위한 useEffect
-  // useEffect(() => {
-  //   fetch("https://api.json-generator.com/templates/ePNAVU1sgGtQ/data", {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-type": "application/json",
-  //       Authorization: "Bearer 22swko029o3wewjovgvs9wcqmk8p3ttrepueemyj",
-  //     },
-  //   })
-  //     .then((res) => res.json())
-  //     .then((res) => console.log(res));
-  // });
-
+/**받아온 데이터를 UI로 구성하기*/
+const ClubItemUI = memo(({ clubList }: { clubList: IClub[] }) => {
+  // console.log(clubList);
   const [like, setLike] = useState(false);
 
-  /** 한국식 요일 설정을 위한 상수 */
-  const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
+  const navigate = useNavigate();
 
   return (
     <>
       <Styled.ClubItemContainer>
         {clubList.map((club, idx) => (
-          <Styled.ClubItem key={idx}>
-            <Styled.ClubThumbnail src={`${club.thumbnail}`} alt="사진" />
+          <Styled.ClubItem
+            key={idx}
+            onClick={() => {
+              navigate(`/club/${club.id}`);
+            }}
+          >
+            <Styled.ClubThumbnail
+              src={`${club.thumbnail}`}
+              alt={`${club.title}`}
+            />
             <Styled.ClubInfoHeader>
               <p>{club.title}</p>
-              {club.leader ? (
-                <Styled.ClubLeaderLabel>{club.leader}</Styled.ClubLeaderLabel>
-              ) : null}
+              {Object.values(club.leaders[0]) ? (
+                <Styled.ClubLeaderLabel>
+                  {Object.values(club.leaders[0])}
+                </Styled.ClubLeaderLabel>
+              ) : (
+                ""
+              )}
               <span>{club.desc}</span>
             </Styled.ClubInfoHeader>
             <Styled.ClubSubInfo>
@@ -101,9 +95,9 @@ const ClubItemUI = memo(({ clubList }: { clubList: CardInfo[] }) => {
                 </p>
               </div>
               <Styled.LikeButton
-                onClick={() => {
-                  setLike(!like);
-                }}
+              // onClick={() => {
+              //   setLike(!like);
+              // }}
               >
                 <img
                   src={like === false ? iconUnlike : iconLike}
@@ -124,7 +118,7 @@ const ListPage = () => {
       <SearchBar />
       <ClubListContainer>
         <ListTitle>모든 클럽 보기</ListTitle>
-        <ClubDataFromServer />
+        <ClubListFromServer />
       </ClubListContainer>
     </>
   );
