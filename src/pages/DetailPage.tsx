@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import React from "react";
+import { useParams } from "react-router-dom";
 import styled from "@emotion/styled";
 import { IClub, IClubListFromServer } from "../types/types";
 import { useFetch } from "../hooks";
@@ -37,7 +37,7 @@ const formatClubDetail = (data: IClubListFromServer[]): IClub[] => {
   return data
     .filter((clubList) => clubList.club.id === params.clubId)
     .map((club) => {
-      console.log(club);
+      // console.log(club);
       return {
         id: club.club.id,
         thumbnail: club.club.coverUrl,
@@ -58,9 +58,12 @@ const ClubDetailUI = ({ clubDetail }: { clubDetail: IClub[] }) => {
   const installmentPrice = `${
     clubDetail[0].price / clubDetail[0].meeting.length
   }`;
+
   const regExForInstallMent = installmentPrice
     .toString()
     .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+
+  console.log(clubDetail);
 
   return (
     <React.Fragment>

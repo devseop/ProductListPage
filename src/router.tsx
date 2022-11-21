@@ -7,8 +7,8 @@ function Router() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<ListPage />} />
-        <Route path="/club/:clubId" element={<DetailPage />} />
+        <Route path="/clubs" element={<ListPage />} />
+        <Route path="/clubs/:clubId" element={<DetailPage />} />
       </Routes>
     </BrowserRouter>
   );
