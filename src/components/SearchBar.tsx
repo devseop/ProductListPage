@@ -12,7 +12,11 @@ const SearchBar = () => {
 
   const submitSearchInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      navigate(`/clubs/?searchKeyword=${queryString}`);
+      if (queryString.length <= 0) {
+        navigate("/clubs");
+      } else {
+        navigate(`/clubs/?searchKeyword=${queryString}`);
+      }
     }
   };
 

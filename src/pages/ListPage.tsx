@@ -57,7 +57,7 @@ const formatClubList = (data: IClubListFromServer[]): IClub[] => {
 
 /**받아온 데이터를 UI로 구성하기*/
 const ClubItemUI = memo(({ clubList }: { clubList: IClub[] }) => {
-  // console.log(clubList);
+  console.log(clubList);
   const [like, setLike] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -67,8 +67,8 @@ const ClubItemUI = memo(({ clubList }: { clubList: IClub[] }) => {
     location.search.slice(15, location.search.length)
   );
 
-  console.log(location.search.length);
-  console.log(decodeURI(location.search.slice(15, location.search.length)));
+  // console.log(location.search.length);
+  // console.log(decodeURI(location.search.slice(15, location.search.length)));
 
   return (
     <>
