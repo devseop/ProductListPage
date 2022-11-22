@@ -1,130 +1,91 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useQuery } from "react-query";
 import styled from "@emotion/styled";
-import { IClub, IClubListFromServer } from "../types/types";
-import { useFetch } from "../hooks";
+import { fetchClubList } from "../api";
+import { IClub } from "../types/types";
 import BackBtn from "../components/BackBtn";
-import { DAYS } from "./ListPage";
+import { DAYS } from "../lib/const";
 
-const ClubFromServer = () => {
-  const { data: ClubsFromServer, error } = useFetch<IClubListFromServer[]>(
-    "https://api.json-generator.com/templates/ePNAVU1sgGtQ/data",
-    {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json",
-        Authorization: "Bearer 22swko029o3wewjovgvs9wcqmk8p3ttrepueemyj",
-      },
-    }
-  );
+const DetailPage = () => {
+  const {
+    data: clubs,
+    isLoading,
+    isError,
+    error,
+  } = useQuery<IClub[], Error>("clubs", fetchClubList);
 
-  if (!ClubsFromServer) {
-    return <p>Loading...</p>;
-  }
+  if (isLoading) return <div>Loading...</div>;
 
-  if (error) {
-    return <p>error</p>;
-  }
+  if (isError) return <div>{error.message}</div>;
 
-  const clubDetail = formatClubDetail(ClubsFromServer);
-
-  return <ClubDetailUI clubDetail={clubDetail} />;
-};
-
-const formatClubDetail = (data: IClubListFromServer[]): IClub[] => {
-  const params = useParams();
-
-  return data
-    .filter((clubList) => clubList.club.id === params.clubId)
-    .map((club) => {
-      // console.log(club);
-      return {
-        id: club.club.id,
-        thumbnail: club.club.coverUrl,
-        title: club.club.name,
-        desc: club.club.description,
-        leaders: club.leaders,
-        partners: club.partners,
-        startTime: club.club.meetings[0].startedAt,
-        endTime: club.club.meetings[0].endedAt,
-        place: club.club.place,
-        meeting: club.club.meetings,
-        price: club.price,
-      };
-    });
-};
-
-const ClubDetailUI = ({ clubDetail }: { clubDetail: IClub[] }) => {
+  /** 할부 */
   const installmentPrice = `${
-    clubDetail[0].price / clubDetail[0].meeting.length
+    clubs && clubs[0].price / clubs[0].meeting.length
   }`;
 
+  /** 할부 금액 변환을 위한 정규표현식 */
   const regExForInstallMent = installmentPrice
     .toString()
     .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
-  console.log(clubDetail);
+  console.log(clubs);
 
   return (
     <React.Fragment>
-      <ClubHeader.Container>
-        <ClubHeader.CoverImage
-          src={`${clubDetail[0].thumbnail}`}
-          alt={`${clubDetail[0].title}`}
-        />
-        <ClubHeader.HeadInfo>
-          <ClubHeader.ClubTitle>{clubDetail[0].title}</ClubHeader.ClubTitle>
-          <ClubHeader.ClubLeader>
-            {clubDetail[0].leaders[0].name} 님
-          </ClubHeader.ClubLeader>
-          <ClubHeader.Place>모임 장소 | {clubDetail[0].place}</ClubHeader.Place>
-          <ClubHeader.FirstMeet>
-            첫 모임일 | {clubDetail[0].startTime.slice(0, 10)}(
-            {DAYS[new Date(clubDetail[0].startTime).getDay()]}){" "}
-            {clubDetail[0].startTime.slice(11, 16)}
-          </ClubHeader.FirstMeet>
-        </ClubHeader.HeadInfo>
-        <ClubHeader.SubInfo>
-          <span>
-            5만원 이상 결제 시 모든 신용카드 무이자 4개월 / 월{" "}
-            {`${regExForInstallMent}`}원
-          </span>
-          <p>
-            {clubDetail[0].meeting.length}회{" "}
-            {clubDetail[0].price
-              .toString()
-              .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
-            원
-          </p>
-        </ClubHeader.SubInfo>
-      </ClubHeader.Container>
-      <ClubContent.Container>
-        <ClubContent.Label>클럽 상세 안내</ClubContent.Label>
-        <ClubContent.Label>모임정보</ClubContent.Label>
-        <ClubContent.Description>{clubDetail[0].desc}</ClubContent.Description>
-        <ClubContent.Label>모임장소</ClubContent.Label>
-        <ClubContent.Description>{clubDetail[0].place}</ClubContent.Description>
-        <ClubContent.Label>모임일정</ClubContent.Label>
-        <ClubContent.Description>
-          {clubDetail[0].meeting.map((item, idx) => (
-            <li key={idx}>
-              {idx + 1}회차 | {item.startedAt.slice(0, 10)}(
-              {DAYS[new Date(item.startedAt).getDay()]}){" "}
-              {item.startedAt.slice(11, 16)}
-            </li>
-          ))}
-        </ClubContent.Description>
-      </ClubContent.Container>
-    </React.Fragment>
-  );
-};
-
-const DetailPage = () => {
-  return (
-    <>
       <BackBtn />
-      <ClubFromServer />
-    </>
+      {clubs && (
+        <>
+          <ClubHeader.Container>
+            <ClubHeader.CoverImage
+              src={`${clubs[0].thumbnail}`}
+              alt={`${clubs[0].title}`}
+            />
+            <ClubHeader.HeadInfo>
+              <ClubHeader.ClubTitle>{clubs[0].title}</ClubHeader.ClubTitle>
+              <ClubHeader.ClubLeader>
+                {clubs[0].leaders[0].name} 님
+              </ClubHeader.ClubLeader>
+              <ClubHeader.Place>모임 장소 | {clubs[0].place}</ClubHeader.Place>
+              <ClubHeader.FirstMeet>
+                첫 모임일 | {clubs[0].startTime.slice(0, 10)}(
+                {DAYS[new Date(clubs[0].startTime).getDay()]}){" "}
+                {clubs[0].startTime.slice(11, 16)}
+              </ClubHeader.FirstMeet>
+            </ClubHeader.HeadInfo>
+            <ClubHeader.SubInfo>
+              <span>
+                5만원 이상 결제 시 모든 신용카드 무이자 4개월 / 월{" "}
+                {`${regExForInstallMent}`}원
+              </span>
+              <p>
+                {clubs[0].meeting.length}회{" "}
+                {clubs[0].price
+                  .toString()
+                  .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
+                원
+              </p>
+            </ClubHeader.SubInfo>
+          </ClubHeader.Container>
+          <ClubContent.Container>
+            <ClubContent.Label>클럽 상세 안내</ClubContent.Label>
+            <ClubContent.Label>모임정보</ClubContent.Label>
+            <ClubContent.Description>{clubs[0].desc}</ClubContent.Description>
+            <ClubContent.Label>모임장소</ClubContent.Label>
+            <ClubContent.Description>{clubs[0].place}</ClubContent.Description>
+            <ClubContent.Label>모임일정</ClubContent.Label>
+            <ClubContent.Description>
+              {clubs[0].meeting.map((item, idx) => (
+                <li key={idx}>
+                  {idx + 1}회차 | {item.startedAt.slice(0, 10)}(
+                  {DAYS[new Date(item.startedAt).getDay()]}){" "}
+                  {item.startedAt.slice(11, 16)}
+                </li>
+              ))}
+            </ClubContent.Description>
+          </ClubContent.Container>
+        </>
+      )}
+    </React.Fragment>
   );
 };
 
